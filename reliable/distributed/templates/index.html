@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title> faceID </title>
+		<meta charset="utf-8">
+
+	</head>
+	<body>	
+		<form action= "" method="POST" enctype="multipart/form-data">
+			{% for field in form.visible_fields %}
+				{{field.label_tag}} 
+				{{field}} <br>
+				{{field.errors}}
+			{% endfor %}
+			<input type="submit" value="Save" class="btn btn-primary">
+			{% csrf_token %}
+		</form>
+		{% for err in form.non_field_errors %}
+		    {{ err }}
+		{% endfor %}
+	</body>
+</html>
