@@ -11,8 +11,8 @@ port = 420
 
 init_values = { 'requestType' : 'newPhotos', 'photos' : 'hello'}
 init_data = json.dumps(init_values)
-f = {'test' : open('test/dog.jpg', 'rb')}
-r = requests.post(server_address, json=init_values, files=f)
+f = {'requestType' : 'newPhotos', 'zip' : ('blah.txt', 'foo\n')}
+r = requests.post(server_address, files=f)
 if r.status_code != 200:
     print("Error: unable to initialize with server")
     sys.exit()

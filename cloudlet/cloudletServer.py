@@ -3,28 +3,37 @@ import os
 from io import BytesIO
 import json
 import ast
+import cgi
 
 #Create custom HTTPRequestHandler class
 class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
     print("post received")
-    content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
     self.send_response(200)
     self.end_headers()
-    tempBody = self.rfile.read(content_length) # <--- Gets the data itself
-    body = json.loads(tempBody)
-    if(body['requestType'] == 'newJob'):
-       response = {'IP':'128.9.20,1', 'port':'80'}
-       response = json.dumps(response)
-       self.wfile.write(response.encode('utf-8'))
-    elif(body['requestType'] == 'newPhotos'):
-       #fill this in
-       print("newPhotos request")
-       photo = body['photos']
-       print(photo)
-       #f = body['test']
-       #print(f)
+    form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST',
+                     'CONTENT_TYPE':self.headers['Content-Type'],
+                     })
+    # filename = form['zip'].filename
+    # data = form['zip'].file.read()
+    # print(data)
+    # f = open("/tmp/%s"%filename, "wb")
+    # f.write(data)
+    # f.close()
+    reqType = form['requestType'].value
+    #only decode if it isn't already in string form
+    try:
+      reqType = reqType.decode('utf-8')
+    except AttributeError:
+      pass
+    if reqType == "newPhotos":
+      print("newPhotos, put it in the unknown dir")
+    if reqType == "newJob":
+      print("newJob, put it in the known dir")
     return
 
 
