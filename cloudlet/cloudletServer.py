@@ -18,11 +18,11 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
             environ={'REQUEST_METHOD':'POST',
                      'CONTENT_TYPE':self.headers['Content-Type'],
                      })
-    filename = form['zip'].filename
-    data = form['zip'].file.read()
-    f = open(os.path.join(os.getcwd(), "tmp", filename), "wb")
-    f.write(data)
-    f.close()
+    # filename = form['zip'].filename
+    # data = form['zip'].file.read()
+    # f = open(os.path.join(os.getcwd(), "tmp", filename), "wb")
+    # f.write(data)
+    # f.close()
     reqType = self.getKeyValue(form, "requestType")
     if reqType == "newPhotos":
       print("newPhotos, put it in the unknown dir")
@@ -45,11 +45,11 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
 
 
 def run(ip, port):
-  print('cloudlet server starting...')
+  print('Cloudlet server starting...')
 
   #ip and port of server
-  print("ip address: " + ip + " port: " + str(port))
+  print("Cloudlet IP address: " + ip + " port: " + str(port))
   server_address = (ip, port)
   httpd = HTTPServer(server_address, CloudletHTTPRequestHandler)
-  print('cloudlet server running...')
+  print('Cloudlet server running...')
   httpd.serve_forever()
