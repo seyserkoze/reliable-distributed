@@ -4,12 +4,14 @@ from io import BytesIO
 import json
 import ast
 import cgi
+import cloudletClient
+import cloudletSettings as settings
 
 #Create custom HTTPRequestHandler class
 class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
-    print("post received")
+    print("Request received")
     self.send_response(200)
     self.end_headers()
     form = cgi.FieldStorage(
@@ -18,19 +20,37 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
             environ={'REQUEST_METHOD':'POST',
                      'CONTENT_TYPE':self.headers['Content-Type'],
                      })
-    # filename = form['zip'].filename
-    # data = form['zip'].file.read()
-    # f = open(os.path.join(os.getcwd(), "tmp", filename), "wb")
-    # f.write(data)
-    # f.close()
     reqType = self.getKeyValue(form, "requestType")
+
     if reqType == "newPhotos":
       print("newPhotos, put it in the unknown dir")
-      #create a directory with a unique name to search against known dirs
-    if reqType == "newJob":
-      jobName = self.getKeyValue(form, "jobName")
-      print("New Job received: %s", jobName)
+      filename = form['zip'].filename
+      data = form['zip'].file.read()
+      fp = open(os.path.join(settings.unknown_dir, filename), "wb")
+      fp.write(data)
+      fp.close()
+      #call the client to search against it
+      cloudletClient.processPhotos(filename)
+
+    elif reqType == "newJob":
       #make a directory with the job name and register it
+      filename = form['zip'].filename
+      jobName = filename[:-4]
+      print("New Job received: " + jobName)
+      data = form['zip'].file.read()
+      fp = open(os.path.join(settings.known_dir, filename), "wb")
+      fp.write(data)
+      fp.close()
+      #call the client to unzip it and add the job
+      cloudletClient.newJob(jobName)
+
+    elif reqType == "deleteJob":
+      jobName = self.getKeyValue(form, "jobName")
+      print ("Deleting Job: " +  jobName + "...")
+      if cloudletClient.deleteJob(jobName) != 0:
+        print("Error deleting job!")
+        #send an error back to the server
+
     return
 
   #gets the value from the form and decodes it to a string if necessary
