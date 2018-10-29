@@ -18,23 +18,30 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
             environ={'REQUEST_METHOD':'POST',
                      'CONTENT_TYPE':self.headers['Content-Type'],
                      })
-    # filename = form['zip'].filename
-    # data = form['zip'].file.read()
-    # print(data)
-    # f = open("/tmp/%s"%filename, "wb")
-    # f.write(data)
-    # f.close()
-    reqType = form['requestType'].value
-    #only decode if it isn't already in string form
-    try:
-      reqType = reqType.decode('utf-8')
-    except AttributeError:
-      pass
+    filename = form['zip'].filename
+    data = form['zip'].file.read()
+    f = open(os.path.join(os.getcwd(), "tmp", filename), "wb")
+    f.write(data)
+    f.close()
+    reqType = self.getKeyValue(form, "requestType")
     if reqType == "newPhotos":
       print("newPhotos, put it in the unknown dir")
+      #create a directory with a unique name to search against known dirs
     if reqType == "newJob":
-      print("newJob, put it in the known dir")
+      jobName = self.getKeyValue(form, "jobName")
+      print("New Job received: %s", jobName)
+      #make a directory with the job name and register it
     return
+
+  #gets the value from the form and decodes it to a string if necessary
+  def getKeyValue(self, form, key):
+    value = form[key].value
+    #only decode if it isn't already in string form
+    try:
+      value = value.decode('utf-8')
+    except AttributeError:
+      pass
+    return value
 
 
 def run(ip, port):
