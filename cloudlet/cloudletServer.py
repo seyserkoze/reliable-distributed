@@ -11,7 +11,6 @@ import cloudletSettings as settings
 class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
 
   def do_POST(self):
-    print("Request received")
     self.send_response(200)
     self.end_headers()
     form = cgi.FieldStorage(
@@ -23,7 +22,7 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
     reqType = self.getKeyValue(form, "requestType")
 
     if reqType == "newPhotos":
-      print("newPhotos, put it in the unknown dir")
+      print("unknown photo set received")
       filename = form['zip'].filename
       data = form['zip'].file.read()
       fp = open(os.path.join(settings.unknown_dir, filename), "wb")

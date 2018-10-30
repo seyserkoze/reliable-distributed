@@ -14,7 +14,7 @@ def init_cloudlet():
         shutil.rmtree(settings.unknown_dir)
     os.makedirs(settings.known_dir)
     os.makedirs(settings.unknown_dir)
-    register yourself with the server
+    #register yourself with the server
     serv_addr = settings.serv_ip + str(settings.serv_port)
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
     r = requests.post(serv_addr, files=init_values)
@@ -32,11 +32,17 @@ def newJob(jobName):
     fp.extractall(settings.known_dir)
     fp.close()
     os.unlink(zip_dir)
+    print(os.listdir(zip_dir[:-4]))
     #get the face_encodings for each one
     for pic in os.listdir(zip_dir[:-4]):
-        image = face_recognition.load_image_file(pic)
+        pic_path = os.path.join(zip_dir[:-4], pic)
+        if pic[0] == ".":
+            continue
+        image = face_recognition.load_image_file(pic_path)
         encoding = face_recognition.face_encodings(image)[0]
         settings.jobs[jobName].append(encoding)
+    #delete the pictures once we get the encodings
+    shutil.rmtree(zip_dir[:-4])
 
 
 def deleteJob(jobName):
@@ -44,7 +50,6 @@ def deleteJob(jobName):
     del settings.jobs[jobName]
     #delete that directory
     job_dir = os.path.join(settings.known_dir, jobName)
-    shutil.rmtree(job_dir)
     return
 
 #should probably do this in a new thread, since itll be slow af and itl happen alot
@@ -62,11 +67,13 @@ def processPhotos(newZip):
     knowns = []
     #get the face_encodings for each one
     for pic in os.listdir(os.path.join(extractPath, newZip[:-4])):
+        if pic[0] == ".":
+            continue
         pic_path = os.path.join(extractPath, newZip[:-4], pic)
         image = face_recognition.load_image_file(pic_path)
         unknown = face_recognition.face_encodings(image)[0]
         if not match_found:
-            for k, v in dict.items():
+            for k, v in settings.jobs.items():
                 result = face_recognition.compare_faces(v, unknown)
                 if result[0]:
                     print("match found! Picture: " + pic)
@@ -79,6 +86,7 @@ def processPhotos(newZip):
                     job = k
                     knowns = v
                     break
+        #once a match is found only check against that one job
         else:
             result = face_recognition.compare_faces(knowns, unknown)
             if result[0]:
@@ -91,11 +99,13 @@ def processPhotos(newZip):
                 shutil.move(pic_path, os.path.join(match_path, pic))
     if match_found:
         #send it back to the server
-        zipMatches = os.path.join(extractPath, job + ".zip")
+        zipMatches = os.path.join(extractPath, job)
         shutil.make_archive(zipMatches, "zip", os.path.join(extractPath, job))
         reqBody = {"requestType" : "match", "zip" : open(zipMatches, "rb")}
         r = requests.post(settings.serv_ip + ":" + settings.serv_port, files=reqBody)
         if r.status_code != 200:
             print("Unable to send matches to the server")
+    else:
+        print("No Matches found")
     shutil.rmtree(extractPath)
     return

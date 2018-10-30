@@ -11,7 +11,7 @@ def init_settings():
     global unknown_dir
     global unique_id
     jobs = {}
-    serv_ip = 'http://128.237.213.171' 
+    serv_ip = 'http://128.237.185.97' 
     serv_port = 80 
     my_ip = socket.gethostbyname(socket.gethostname())
     my_port = 80
