@@ -47,9 +47,7 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
     elif reqType == "deleteJob":
       jobName = self.getKeyValue(form, "jobName")
       print ("Deleting Job: " +  jobName + "...")
-      if cloudletClient.deleteJob(jobName) != 0:
-        print("Error deleting job!")
-        #send an error back to the server
+      cloudletClient.deleteJob(jobName)
 
     return
 
