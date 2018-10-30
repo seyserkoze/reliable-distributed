@@ -3,7 +3,7 @@ import os
 import shutil
 import zipfile
 import cloudletSettings as settings
-#import face_recognition
+import face_recognition
 
 
 def init_cloudlet():
