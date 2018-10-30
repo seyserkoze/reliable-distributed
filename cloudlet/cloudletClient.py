@@ -32,7 +32,6 @@ def newJob(jobName):
     fp.extractall(settings.known_dir)
     fp.close()
     os.unlink(zip_dir)
-    print(os.listdir(zip_dir[:-4]))
     #get the face_encodings for each one
     for pic in os.listdir(zip_dir[:-4]):
         pic_path = os.path.join(zip_dir[:-4], pic)
