@@ -14,9 +14,9 @@ check this out later for multithreading: https://stackoverflow.com/questions/140
 
 ##### From the Server:
 
-To send a create a new job: 
-    key: requestType    value: newJob
-    key: zip            value: (zipfile containing the job(name of zipfile MUST be "jobName.zip"))
+To send a create a new job:__ 
+    key: requestType    value: newJob__
+    key: zip            value: (zipfile containing the job(name of zipfile MUST be "jobName.zip"))__
 
 To delete a job:
     key: requestType    value: deleteJob
@@ -38,4 +38,4 @@ To initialize itself(everything here is a string):
 
 To send found matches to the server:
     key: requestType    value: match
-    key: zip            value: (zipfile containing the matches, name of the zipfile will be the name of the job)
+    key: zip            value: (zipfile containing the matches, name of the zipfile will be the name of job)
