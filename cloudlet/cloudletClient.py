@@ -15,7 +15,7 @@ def init_cloudlet():
     os.makedirs(settings.known_dir)
     os.makedirs(settings.unknown_dir)
     #register yourself with the server
-    serv_addr = settings.serv_ip + str(settings.serv_port)
+    serv_addr = settings.serv_ip + ":" + str(settings.serv_port)
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
     r = requests.post(serv_addr, files=init_values)
     if r.status_code != 200:
@@ -100,8 +100,8 @@ def processPhotos(newZip):
         #send it back to the server
         zipMatches = os.path.join(extractPath, job)
         shutil.make_archive(zipMatches, "zip", os.path.join(extractPath, job))
-        reqBody = {"requestType" : "match", "zip" : open(zipMatches, "rb")}
-        r = requests.post(settings.serv_ip + ":" + settings.serv_port, files=reqBody)
+        reqBody = {"requestType" : "match", "zip" : open(zipMatches +".zip", "rb")}
+        r = requests.post(settings.serv_ip + ":" + str(settings.serv_port), files=reqBody)
         if r.status_code != 200:
             print("Unable to send matches to the server")
     else:
