@@ -1,7 +1,7 @@
 import socket
 import os
 
-def init_settings():
+def init_settings(server_addr):
     global jobs
     global serv_ip
     global serv_port
@@ -11,7 +11,7 @@ def init_settings():
     global unknown_dir
     global unique_id
     jobs = {}
-    serv_ip = 'http://128.237.135.128' 
+    serv_ip = 'http://' + server_addr 
     serv_port = 80 
     my_ip = socket.gethostbyname(socket.gethostname())
     my_port = 80
