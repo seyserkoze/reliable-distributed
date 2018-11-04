@@ -33,7 +33,8 @@ if (x == "yes"):
     cloudletConnection = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
 
     # create new directory to hold cropped faces
-    newpath = os.getcwd() + '/images/faces'
+    # changed it to the unknown folder for now for the demo
+    newpath = os.getcwd() + '/unknown'
     print (newpath)
     if not os.path.exists(newpath):
         os.makedirs(newpath)
