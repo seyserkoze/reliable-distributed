@@ -53,3 +53,13 @@ To send found matches to the server:
     key: requestType    value: match
 
     key: zip            value: (zipfile containing the matches, name of the zipfile will be the name of the job)
+
+
+### TODO:
+error checking: make sure the photos coming in actually have faces on them, and check every face rather than just the first one
+
+error checking: checking the responses of shit i send to the server, if it's down then deal with it somehow
+
+message loss,
+process or object crashes
+hardware crash
