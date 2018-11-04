@@ -10,6 +10,8 @@ cloudletPort = "temp"
 
 #set yourself up with the server
 def registerPhone():
+    global cloudletIP
+    global cloudletPort
     # tell server that you would like to help find the kid
     serverResponse = requests.post(serverConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
     r = json.loads(serverResponse.text)
@@ -48,7 +50,7 @@ if (x == "yes"):
     shutil.make_archive('output', 'zip', newpath)
     
     # send zipped directory file to cloudlet
-    files = {'file': open('output.zip', 'rb')}
+    files = {'requestType': 'newPhotos' ,'zip': open('output.zip', 'rb')}
     cloudletResponse = requests.post(cloudletConnection, files=files)
 
 
