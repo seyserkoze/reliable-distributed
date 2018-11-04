@@ -10,7 +10,7 @@ serverConnection = "http://128.237.213.171:80"
 
 
 def isAfterAmber(filePath, amberTime = 10):
-    return true;
+    return true
 
 x = input("would you like to send your photos? ")
 
@@ -26,10 +26,6 @@ if (x == "yes"):
 
     cloudletConnection = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
 
-    # ping the cloudlet to tell it that the client would like to assist
-    cloudletResponse = requests.post(cloudletConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
-
-
     # create new directory to hold cropped faces
     newpath = os.getcwd() + '/images/faces'
     print (newpath)
@@ -37,11 +33,11 @@ if (x == "yes"):
         os.makedirs(newpath)
 
     # TODO: crop faces and put in new directory
-    src_dir = "your/source/dir"
-    dst_dir = "your/destination/dir"
-    for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
-        if (isAfterAmber(jpgfile, amberTime)):
-            shutil.copy(jpgfile, dst_dir)
+    # src_dir = "your/source/dir"
+    # dst_dir = "your/destination/dir"
+    # for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
+    #     if (isAfterAmber(jpgfile, amberTime)):
+    #         shutil.copy(jpgfile, dst_dir)
 
 
     # zip new directory
@@ -53,7 +49,5 @@ if (x == "yes"):
 
 
     # TODO: delete directory and zipped file
-
-
-
-    
+    os.remove('output.zip')
+    print("images sent")
