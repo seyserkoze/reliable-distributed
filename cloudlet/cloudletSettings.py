@@ -16,6 +16,6 @@ def init_settings(server_addr):
     my_ip = socket.gethostbyname(socket.gethostname())
     my_port = 80
     known_dir = os.path.join(os.getcwd(), "__known")
-    unknown_dir = os.path.join(os.getcwd(), "__unkown")
+    unknown_dir = os.path.join(os.getcwd(), "__unknown")
     unique_id = 0
     
