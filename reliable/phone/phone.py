@@ -5,17 +5,11 @@ import shutil
 
 
 serverConnection = "http://128.237.213.171:80" 
-# cloudletConnection = "http://192.168.26.1:420" 
+cloudletIP = "temp"
+cloudletPort = "temp"
 
-
-
-def isAfterAmber(filePath, amberTime = 10):
-    return true
-
-x = input("would you like to send your photos? ")
-
-
-if (x == "yes"): 
+#set yourself up with the server
+def registerPhone():
     # tell server that you would like to help find the kid
     serverResponse = requests.post(serverConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
     r = json.loads(serverResponse.text)
@@ -23,6 +17,16 @@ if (x == "yes"):
     # Parse the server response for the cloudlet's IP and Port
     cloudletIP = r["IP"]
     cloudletPort = r["port"]
+
+
+def isAfterAmber(filePath, amberTime = 10):
+    return true
+
+x = input("would you like to send your photos? ")
+
+# TODO: make this into a loop so you can continuously send more photos
+if (x == "yes"): 
+    registerPhone()
 
     cloudletConnection = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
 
