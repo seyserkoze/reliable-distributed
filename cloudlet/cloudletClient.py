@@ -14,7 +14,7 @@ def init_cloudlet():
         shutil.rmtree(settings.unknown_dir)
     os.makedirs(settings.known_dir)
     os.makedirs(settings.unknown_dir)
-    #register yourself with the server
+    register yourself with the server
     serv_addr = settings.serv_ip + ":" + str(settings.serv_port)
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
     r = requests.post(serv_addr, files=init_values)
@@ -65,10 +65,10 @@ def processPhotos(newZip):
     job = "blah"
     knowns = []
     #get the face_encodings for each one
-    for pic in os.listdir(os.path.join(extractPath, newZip[:-4])):
+    for pic in os.listdir(extractPath):
         if pic[0] == ".":
             continue
-        pic_path = os.path.join(extractPath, newZip[:-4], pic)
+        pic_path = os.path.join(extractPath, pic)
         image = face_recognition.load_image_file(pic_path)
         unknown = face_recognition.face_encodings(image)[0]
         if not match_found:
