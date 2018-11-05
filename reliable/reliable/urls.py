@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+import distributed.views 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', distributed.views.home, name='home')
 ]
