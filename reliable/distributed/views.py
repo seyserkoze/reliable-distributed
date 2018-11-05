@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from distributed.models import *
 
 # Create your views here.
 def home(request):
