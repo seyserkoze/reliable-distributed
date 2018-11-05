@@ -2,18 +2,22 @@ import requests
 import json
 import os
 import shutil
+import glob
+import faceCropping
 
-
-serverConnection = "http://128.237.213.171:80" 
+serverConnection = "http://128.237.178.179:80"
+# 128.237.178.179
 cloudletIP = "temp"
 cloudletPort = "temp"
 
+amberTime = 10
 #set yourself up with the server
 def registerPhone():
     global cloudletIP
     global cloudletPort
     # tell server that you would like to help find the kid
-    serverResponse = requests.post(serverConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
+    serverResponse = requests.post(serverConnection, files={"requestType":"phoneJoinReq","id": "1"})
+    print (serverResponse.text)
     r = json.loads(serverResponse.text)
     
     # Parse the server response for the cloudlet's IP and Port
@@ -21,8 +25,9 @@ def registerPhone():
     cloudletPort = r["port"]
 
 
+
 def isAfterAmber(filePath, amberTime = 10):
-    return true
+    return True
 
 x = input("would you like to send your photos? ")
 
@@ -40,17 +45,18 @@ if (x == "yes"):
         os.makedirs(newpath)
 
     # TODO: crop faces and put in new directory
-    # src_dir = "your/source/dir"
-    # dst_dir = "your/destination/dir"
-    # for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
-    #     if (isAfterAmber(jpgfile, amberTime)):
-    #         shutil.copy(jpgfile, dst_dir)
-
-
+    # src_dir = os.getcwd() + '/images'
+    #dst_dir = os.getcwd() + '/images/faces'
+    #for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
+    #    fname, ext = os.path.splitext(jpgfile)
+    #    if (isAfterAmber(fname, amberTime)):
+    #        facecrop(jpgfile)
+    
     # zip new directory
     shutil.make_archive('output', 'zip', newpath)
     
     # send zipped directory file to cloudlet
+
     files = {'requestType': 'newPhotos' ,'zip': open('output.zip', 'rb')}
     cloudletResponse = requests.post(cloudletConnection, files=files)
 
