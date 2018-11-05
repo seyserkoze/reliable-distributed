@@ -15,4 +15,5 @@ def home(request):
 
 	new_user = User(name=name, email=email, picture=picture)
 	new_user.save()
+	context['message'] = "Thank you, your information has been saved. We will send you an email at " + str(email) + " as soon as we get any updates."
 	return render(request, 'index.html', context)

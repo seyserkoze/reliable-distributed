@@ -11,10 +11,10 @@
 			Name: <input type="text" name='name' placeholder="Name"> <br> <br>
 			Email: <input type="email" name='email' placeholder="Email"><br><br>
 			Picture: <input type="file" name='picture'> <br><br>
-			<input type="submit" val="Submit Information">
+			<input type="submit" val="Submit Information"> <br>
 			{% csrf_token %}
 		</form>
-
+		{{message}}
 	</body>
 
 </html>
