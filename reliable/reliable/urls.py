@@ -20,5 +20,6 @@ import distributed.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', distributed.views.home, name='home')
+    path('', distributed.views.home, name='home'),
+    path('fetch/', distributed.views.fetch, name='fetch')
 ]
