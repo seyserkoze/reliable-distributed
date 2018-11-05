@@ -98,7 +98,7 @@ def run():
 
   #ip and port of servr
   #by default http server port is 80
-  server_address = ('128.237.135.128', 80)
+  server_address = ('128.237.178.179', 80)
   httpd = HTTPServer(server_address, KodeFunHTTPRequestHandler)
   print('http server is running...')
   httpd.serve_forever()

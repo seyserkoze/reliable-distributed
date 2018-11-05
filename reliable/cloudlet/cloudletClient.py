@@ -14,7 +14,7 @@ def init_cloudlet():
         shutil.rmtree(settings.unknown_dir)
     os.makedirs(settings.known_dir)
     os.makedirs(settings.unknown_dir)
-    register yourself with the server
+    #register yourself with the server
     serv_addr = settings.serv_ip + ":" + str(settings.serv_port)
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
     r = requests.post(serv_addr, files=init_values)
