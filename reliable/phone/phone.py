@@ -2,20 +2,22 @@ import requests
 import json
 import os
 import shutil
-
+import glob
 
 serverConnection = "http://128.237.213.171:80" 
 # cloudletConnection = "http://192.168.26.1:420" 
 
 
+amberTime = 10;
 
 def isAfterAmber(filePath, amberTime = 10):
-    return true;
+    return True;
 
 x = input("would you like to send your photos? ")
 
 
-if (x == "yes"): 
+if (x == "yes"):
+    '''
     # tell server that you would like to help find the kid
     serverResponse = requests.post(serverConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
     r = json.loads(serverResponse.text)
@@ -28,6 +30,7 @@ if (x == "yes"):
 
     # ping the cloudlet to tell it that the client would like to assist
     cloudletResponse = requests.post(cloudletConnection, json.dumps({"requestType":"phoneJoinReq","id": "1"}))
+    '''
 
 
     # create new directory to hold cropped faces
@@ -37,8 +40,8 @@ if (x == "yes"):
         os.makedirs(newpath)
 
     # TODO: crop faces and put in new directory
-    src_dir = "your/source/dir"
-    dst_dir = "your/destination/dir"
+    src_dir = os.getcwd() + '/images'
+    dst_dir = os.getcwd() + '/images/faces'
     for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
         if (isAfterAmber(jpgfile, amberTime)):
             shutil.copy(jpgfile, dst_dir)
@@ -49,7 +52,7 @@ if (x == "yes"):
     
     # send zipped directory file to cloudlet
     files = {'file': open('output.zip', 'rb')}
-    cloudletResponse = requests.post(cloudletConnection, files=files)
+    # cloudletResponse = requests.post(cloudletConnection, files=files)
 
 
     # TODO: delete directory and zipped file
