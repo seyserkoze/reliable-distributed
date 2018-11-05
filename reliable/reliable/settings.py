@@ -72,7 +72,12 @@ WSGI_APPLICATION = 'reliable.wsgi.application'
 
 # Configures django to print emails rather than sending them
 # Comment out this line to enable real email sending
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST  = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "johndoetest4312@gmail.com"
+EMAIL_HOST_PASSWORD = "qwerthnm"
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
