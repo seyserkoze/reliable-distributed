@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head> 
+		<title> faceID </title>
+		<meta charset="utf-8">
+		{% load static %}
+		<link rel= "stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+		<link type="text/css" rel="stylesheet" href="{% static 'css/styles.css' %}">
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+	</head>
+
+	<body>
+		<div class="navbar">
+			<div class="logo col-md-8">
+				faceID
+			</div>
+			<div class="menu col-md-3">
+				<span id="login">
+					PRODUCT
+				</span> 
+				&nbsp;&nbsp;&nbsp;&nbsp;| &nbsp;&nbsp;&nbsp;&nbsp; 
+				<span id="signup">
+					TEAM
+				</span>
+			</div>
+		</div>
+
+		<div class="modal">
+			<div class="header">
+				Welcome to faceID
+			</div>
+			<div class="modal-content">
+				<form action= "" method="POST" enctype="multipart/form-data" class="form-group"> <br>
+					<b> Name </b><br> <input type="text" name='name' placeholder="Name" class="form-control"> <br> 
+					<b>Email </b> <br> <input type="email" name='email' placeholder="Email" class="form-control"><br>
+					<b>Picture</b> <br> <input type="file" name='picture'> <br><br>
+					<input type="submit" val="Submit Information" class="btn btn-primary"> <br> <br>
+					{% csrf_token %}
+				</form>
+				{{message}}
+			</div>
+		</div>
+	</body>
+
+</html>
