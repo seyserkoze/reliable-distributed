@@ -51,8 +51,7 @@ if (x == "yes"):
     #    fname, ext = os.path.splitext(jpgfile)
     #    if (isAfterAmber(fname, amberTime)):
     #        facecrop(jpgfile)
-    #        shutil.copy(fname+"_cropped_"+ext, dst_dir)
-
+    
     # zip new directory
     shutil.make_archive('output', 'zip', newpath)
     
