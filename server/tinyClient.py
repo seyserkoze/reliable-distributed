@@ -4,14 +4,14 @@ import glob
 import json
 
 def main():
-  currLength = len([name for name in os.listdir('./temp/') if os.path.isfile(name)])
-  currResLength = len([name for name in os.listdir('./temp/') if os.path.isfile(name)])
+  currLength = len([name for name in os.listdir('../reliable/reliablemedia/lookup/') if os.path.isfile(name)])
+  currResLength = len([name for name in os.listdir('../reliable/reliablemedia/lookup/') if os.path.isfile(name)])
   print(currLength)
   while(1):
-    tempVar = len(os.listdir('./temp/'))
+    tempVar = len(os.listdir('../reliable/reliablemedia/lookup/'))
     if(currLength < tempVar):
       print('hello')
-      list_of_files = glob.glob('./temp/*')
+      list_of_files = glob.glob('../reliable/reliablemedia/lookup/*')
       latest_file = max(list_of_files, key=os.path.getctime)
       print(latest_file)
       with open("cloudletStore.json", "r") as f:
