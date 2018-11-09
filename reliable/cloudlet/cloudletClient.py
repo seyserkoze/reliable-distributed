@@ -73,51 +73,38 @@ def processPhotos(newZip):
     fp.extractall(extractPath)
     fp.close()
     os.unlink(zip_dir)
-    match_found = False
-    job = "blah"
-    knowns = []
-    #get the face_encodings for each one
-    for pic in os.listdir(extractPath):
-        if pic[0] == ".":
-            continue
-        pic_path = os.path.join(extractPath, pic)
-        try:
-            image = face_recognition.load_image_file(pic_path)
-            unknown = face_recognition.face_encodings(image)[0]
-        except:
-            continue
-        if not match_found:
-            for k, v in settings.jobs.items():
-                result = face_recognition.compare_faces(v, unknown)
-                if True in result:
-                    print("match found! Picture: " + pic)
-                    match_found = True
-                    #move the picture over
-                    match_path = os.path.join(extractPath, k)
-                    if not os.path.exists(match_path):
-                        os.makedirs(match_path)
-                    shutil.move(pic_path, os.path.join(match_path, pic))
-                    job = k
-                    knowns = v
-                    break
-        #once a match is found only check against that one job
-        else:
+    no_matches = True
+    #iterate through each job
+    #this needs to be done before the loop, otherwise get_photos will be returning zip files as well
+    photos = get_photos(extractPath)
+    for job, knowns in settings.jobs.items():
+        match_found = False
+        #get the face_encodings for each one
+        for pic_path in photos:
+            pic = pic_path.split("/")[-1]
+            try:
+                image = face_recognition.load_image_file(pic_path)
+                #assume only one face per image since the phone will be cropping them
+                unknown = face_recognition.face_encodings(image)[0]
+            except:
+                continue
             result = face_recognition.compare_faces(knowns, unknown)
-            if result[0]:
-                print("match found! Picture: " + pic)
+            if True in result:
+                print("match found for " + job + "! Picture: " + pic)
                 match_found = True
+                no_matches = False
                 #move the picture over
                 match_path = os.path.join(extractPath, job)
                 if not os.path.exists(match_path):
                     os.makedirs(match_path)
-                shutil.move(pic_path, os.path.join(match_path, pic))
-    if match_found:
-        #send it back to the server
-        zipMatches = os.path.join(extractPath, job)
-        shutil.make_archive(zipMatches, "zip", os.path.join(extractPath, job))
-        reqBody = {"requestType" : "match", "zip" : open(zipMatches +".zip", "rb")}
-        post_request(reqBody)
-    else:
+                shutil.copy2(pic_path, os.path.join(match_path, pic))
+        if match_found:
+            #send it back to the server
+            zipMatches = os.path.join(extractPath, job)
+            shutil.make_archive(zipMatches, "zip", os.path.join(extractPath, job))
+            reqBody = {"requestType" : "match", "zip" : open(zipMatches +".zip", "rb")}
+            post_request(reqBody)
+    if no_matches:
         print("No Matches found")
     shutil.rmtree(extractPath)
     return
@@ -131,8 +118,14 @@ def leave():
 def heartbeat(interval):
     body = {"requestType" : "heartbeat"}
     while(1):
-        print("sending heartbeat...")
-        post_request(body)
+        print("sending heartbeat...", end="") #dont start a newline
+        try:
+            #try to make a request with a timeout of 1 second
+            requests.post(settings.current_serv, files=body, timeout=1)
+            print("server is alive")
+        except:
+            print("failed, switching server")
+            settings.switch_server()
         time.sleep(interval)
 
 #helper for making requests, add a timeout to detect if a server is down

@@ -67,12 +67,10 @@ To let the server know a phone left it:
 
     key: cloudPort      value: (the port number this cloudlet is listening on)
     
-Heartheat:
+Heartbeat:
 
     key: requestType    value: heartbeat
 
 
 ### TODO:
-clean up processPhotos code, make it check against every job
-
 support location metadata

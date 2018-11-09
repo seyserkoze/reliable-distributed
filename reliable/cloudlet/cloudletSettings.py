@@ -22,7 +22,7 @@ def init_settings(add1, add2, port):
     known_dir = os.path.join(os.getcwd(), "__known")
     unknown_dir = os.path.join(os.getcwd(), "__unknown")
     unique_id = 0
-    lock = _thead.allocate_lock()
+    lock = _thread.allocate_lock()
 
 
 def switch_server():
