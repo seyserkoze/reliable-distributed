@@ -66,6 +66,10 @@ To let the server know a phone left it:
     key: cloudIP        value: (ip address of the cloudlet ex. "128.237.185.97")
 
     key: cloudPort      value: (the port number this cloudlet is listening on)
+    
+Heartheat:
+
+    key: requestType    value: heartbeat
 
 
 ### TODO:
