@@ -4,6 +4,8 @@ import shutil
 import zipfile
 import cloudletSettings as settings
 import face_recognition
+import sys
+import time
 
 
 def init_cloudlet():
@@ -15,9 +17,8 @@ def init_cloudlet():
     os.makedirs(settings.known_dir)
     os.makedirs(settings.unknown_dir)
     #register yourself with the server
-    serv_addr = settings.serv_ip + ":" + str(settings.serv_port)
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
-    r = requests.post(serv_addr, files=init_values)
+    post_request(init_values)
     if r.status_code != 200:
         print("Error: unable to initialize with server")
         sys.exit()
@@ -27,22 +28,33 @@ def newJob(jobName):
     #assume the zip file is already there from the server
     #add the job to the list, extract the zip file and then delete it
     settings.jobs[jobName] = []
-    zip_dir = os.path.join(settings.known_dir, jobName + ".zip")
-    fp = zipfile.ZipFile(zip_dir, 'r')
-    fp.extractall(settings.known_dir)
+    zip_dir = os.path.join(settings.known_dir, jobName)
+    zipped = os.path.join(zip_dir, jobName + ".zip")
+    fp = zipfile.ZipFile(zipped, 'r')
+    fp.extractall(zip_dir)
     fp.close()
-    os.unlink(zip_dir)
+    os.unlink(zipped)
     #get the face_encodings for each one
-    for pic in os.listdir(zip_dir[:-4]):
-        pic_path = os.path.join(zip_dir[:-4], pic)
-        if pic[0] == ".":
-            continue
-        image = face_recognition.load_image_file(pic_path)
-        encoding = face_recognition.face_encodings(image)[0]
-        settings.jobs[jobName].append(encoding)
+    for pic in get_photos(zip_dir):
+        try:
+            image = face_recognition.load_image_file(pic)
+            encodings = face_recognition.face_encodings(image)
+            if len(encodings) > 0:
+                settings.jobs[jobName].append(encodings[0])
+        except:
+            print("unable to get face encoding for " + pic)
     #delete the pictures once we get the encodings
-    shutil.rmtree(zip_dir[:-4])
+    shutil.rmtree(zip_dir)
 
+#recursively tries to find every photo in a directory, assuming there are only image files
+def get_photos(path):
+    result = []
+    for r, d, files in os.walk(path):
+        for f in files:
+            if f[0] == ".":
+                continue
+            result.append(os.path.join(r, f))
+    return result
 
 def deleteJob(jobName):
     #delete that job from the known directories
@@ -57,8 +69,8 @@ def processPhotos(newZip):
     fp = zipfile.ZipFile(zip_dir, 'r')
     #IF YOU DO MULTITHREAD NEED TO LOCK THE NEXT TWO LINES, ADD A MUTEX TO SETTINGS
     extractPath = os.path.join(settings.unknown_dir, str(settings.unique_id))
-    fp.extractall(extractPath)
     settings.unique_id += 1
+    fp.extractall(extractPath)
     fp.close()
     os.unlink(zip_dir)
     match_found = False
@@ -69,12 +81,15 @@ def processPhotos(newZip):
         if pic[0] == ".":
             continue
         pic_path = os.path.join(extractPath, pic)
-        image = face_recognition.load_image_file(pic_path)
-        unknown = face_recognition.face_encodings(image)[0]
+        try:
+            image = face_recognition.load_image_file(pic_path)
+            unknown = face_recognition.face_encodings(image)[0]
+        except:
+            continue
         if not match_found:
             for k, v in settings.jobs.items():
                 result = face_recognition.compare_faces(v, unknown)
-                if result[0]:
+                if True in result:
                     print("match found! Picture: " + pic)
                     match_found = True
                     #move the picture over
@@ -101,10 +116,34 @@ def processPhotos(newZip):
         zipMatches = os.path.join(extractPath, job)
         shutil.make_archive(zipMatches, "zip", os.path.join(extractPath, job))
         reqBody = {"requestType" : "match", "zip" : open(zipMatches +".zip", "rb")}
-        r = requests.post(settings.serv_ip + ":" + str(settings.serv_port), files=reqBody)
-        if r.status_code != 200:
-            print("Unable to send matches to the server")
+        post_request(reqBody)
     else:
         print("No Matches found")
     shutil.rmtree(extractPath)
     return
+
+#let the server know a phone left
+def leave():
+    body = {"requestType" : "phoneLeaveReq", 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
+    post_request(body)
+    return
+
+def heartbeat(interval):
+    body = {"requestType" : "heartbeat"}
+    while(1):
+        print("sending heartbeat...")
+        post_request(body)
+        time.sleep(interval)
+
+#helper for making requests, add a timeout to detect if a server is down
+#switch to the other server if one is down
+def post_request(body):
+    while(1):
+        try:
+            #try to make a request with a timeout of 1 second
+            requests.post(settings.current_serv, files=body, timeout=1)
+            return
+        except:
+            new_num = (settings.server_num+1) % 2
+            print("Server " + settings.server_num + " down, switching to server " + new_num)
+            settings.switch_server()

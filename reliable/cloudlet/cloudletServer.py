@@ -22,7 +22,7 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
     reqType = self.getKeyValue(form, "requestType")
 
     if reqType == "newPhotos":
-      print("unknown photo set received")
+      print("New photo set received for processing")
       filename = form['zip'].filename
       data = form['zip'].file.read()
       fp = open(os.path.join(settings.unknown_dir, filename), "wb")
@@ -37,7 +37,9 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
       jobName = filename[:-4]
       print("New Job received: " + jobName)
       data = form['zip'].file.read()
-      fp = open(os.path.join(settings.known_dir, filename), "wb")
+      jobPath = os.path.join(settings.known_dir, jobName)
+      os.makedirs(jobPath)
+      fp = open(os.path.join(jobPath, filename), "wb")
       fp.write(data)
       fp.close()
       #call the client to unzip it and add the job
@@ -47,6 +49,9 @@ class CloudletHTTPRequestHandler(BaseHTTPRequestHandler):
       jobName = self.getKeyValue(form, "jobName")
       print ("Deleting Job: " +  jobName + "...")
       cloudletClient.deleteJob(jobName)
+
+    elif reqType == "leave":
+      cloudletClient.leave()
 
     return
 

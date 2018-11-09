@@ -36,6 +36,11 @@ To submit unknown photos for processing:
 
     key: zip            value: (zip file containing the photos to check, name can by anything)
 
+To tell the cloudlet you're leaving:
+    
+    key: requestType    value: leave
+
+
 #### Cloudlet Requests to server:
 
 To initialize itself(everything here is a string):
@@ -44,7 +49,7 @@ To initialize itself(everything here is a string):
 
     key: id             value: 1
 
-    key: cloudIP        value: (ip address of the cloudlet ex. "http://128.237.185.97")
+    key: cloudIP        value: (ip address of the cloudlet ex. "128.237.185.97")
 
     key: cloudPort      value: (the port number this cloudlet will listen on)
 
@@ -54,12 +59,16 @@ To send found matches to the server:
 
     key: zip            value: (zipfile containing the matches, name of the zipfile will be the name of the job)
 
+To let the server know a phone left it:
+
+    key: requestType    value: phoneLeaveReq
+
+    key: cloudIP        value: (ip address of the cloudlet ex. "128.237.185.97")
+
+    key: cloudPort      value: (the port number this cloudlet is listening on)
+
 
 ### TODO:
-error checking: make sure the photos coming in actually have faces on them, and check every face rather than just the first one
+clean up processPhotos code, make it check against every job
 
-error checking: checking the responses of shit i send to the server, if it's down then deal with it somehow
-
-message loss,
-process or object crashes
-hardware crash
+support location metadata

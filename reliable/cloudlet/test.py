@@ -5,8 +5,8 @@ import sys
 import os
 
 #init
-server_address = 'http://10.0.0.246:80/'  
-filename = os.path.join(os.getcwd(),"test", "obama.zip")
+server_address = 'http://192.168.1.189:80/'  
+filename = os.path.join(os.getcwd(),"test", "zipme.zip")
 r = {'requestType' : 'newPhotos', 'zip' : open(filename, 'rb')}
 f = {'requestType' : 'newJob', 'zip' : open(filename, "rb")}
 d = {'requestType' : 'deleteJob', 'jobName' : 'zipme'}
