@@ -19,9 +19,6 @@ def init_cloudlet():
     #register yourself with the server
     init_values = { 'requestType' : 'cloudJoinReq', 'id' : '1', 'cloudIP': settings.my_ip, 'cloudPort' : str(settings.my_port)}
     post_request(init_values)
-    if r.status_code != 200:
-        print("Error: unable to initialize with server")
-        sys.exit()
     print("Cloudlet initialized")
 
 def newJob(jobName):
@@ -115,7 +112,13 @@ def leave():
     post_request(body)
     return
 
-def heartbeat(interval):
+def getJobs():
+    time.sleep(5) #give time for the server to initialize
+    body = {"requestType" : "getJobs", "cloudIP" : settings.my_ip, "cloudPort": str(settings.my_port)}
+    post_request(body)
+    return
+
+def heartbeat():
     body = {"requestType" : "heartbeat"}
     while(1):
         print("sending heartbeat...", end="") #dont start a newline
@@ -126,7 +129,7 @@ def heartbeat(interval):
         except:
             print("failed, switching server")
             settings.switch_server()
-        time.sleep(interval)
+        time.sleep(settings.heartbeat_interval)
 
 #helper for making requests, add a timeout to detect if a server is down
 #switch to the other server if one is down
@@ -134,9 +137,10 @@ def post_request(body):
     while(1):
         try:
             #try to make a request with a timeout of 1 second
+            print("posting to " + settings.current_serv)
             requests.post(settings.current_serv, files=body, timeout=1)
             return
         except:
             new_num = (settings.server_num+1) % 2
-            print("Server " + settings.server_num + " down, switching to server " + new_num)
+            print("Server " + str(settings.server_num) + " down, switching to server " + str(new_num))
             settings.switch_server()

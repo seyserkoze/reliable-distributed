@@ -2,7 +2,7 @@ import socket
 import os
 import _thread
 
-def init_settings(add1, add2, port):
+def init_settings(add1, add2, port, interval):
     global jobs
     global servers
     global current_serv
@@ -13,8 +13,9 @@ def init_settings(add1, add2, port):
     global unique_id
     global server_num
     global lock
+    global heartbeat_interval
     jobs = {}
-    servers = ['http://' + add1 + ":80", 'http://' + add2 + ":80"]
+    servers = ['http://' + add1, 'http://' + add2]
     server_num = 0
     current_serv = servers[server_num]
     my_ip = socket.gethostbyname(socket.gethostname())
@@ -23,6 +24,7 @@ def init_settings(add1, add2, port):
     unknown_dir = os.path.join(os.getcwd(), "__unknown")
     unique_id = 0
     lock = _thread.allocate_lock()
+    heartbeat_interval = int(interval)
 
 
 def switch_server():
