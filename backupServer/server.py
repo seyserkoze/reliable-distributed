@@ -57,9 +57,11 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
       leaveCloudlet(cloudletIP, cloudletPort)
 
     elif(reqType == 'getJobs'):
+      cloudletIP = self.getKeyValue(form,"cloudIP")
+      cloudletPort = self.getKeyValue(form,"cloudPort")
       for fileVal in os.listdir("../reliable/reliablemedia/lookup/"):
         if(fileVal.endswith('.zip')):
-          files = {'requestType': 'newJob', 'zip':open(fileVal,'rb')}
+          files = {'requestType': 'newJob', 'zip':open('../reliable/reliablemedia/lookup/'+fileVal,'rb')}
           r = requests.post("http://"+cloudletIP+":"+cloudletPort, files=files)
     return
 
