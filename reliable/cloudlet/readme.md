@@ -70,7 +70,3 @@ To let the server know a phone left it:
 Heartbeat:
 
     key: requestType    value: heartbeat
-
-
-### TODO:
-support location metadata
