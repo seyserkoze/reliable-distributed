@@ -113,15 +113,17 @@ def leave():
     return
 
 def getJobs():
-    time.sleep(5) #give time for the server to initialize
+    time.sleep(4) #give time for the server to initialize
     body = {"requestType" : "getJobs", "cloudIP" : settings.my_ip, "cloudPort": str(settings.my_port)}
     post_request(body)
+    t = get_time()
+    printf(t + ": Receiving current jobs...")
     return
 
 def heartbeat():
     body = {"requestType" : "heartbeat"}
     while(1):
-        print("sending heartbeat...", end="") #dont start a newline
+        print(get_time() + ": sending heartbeat...", end="") #dont start a newline
         try:
             #try to make a request with a timeout of 1 second
             requests.post(settings.current_serv, files=body, timeout=1)
@@ -137,10 +139,12 @@ def post_request(body):
     while(1):
         try:
             #try to make a request with a timeout of 1 second
-            print("posting to " + settings.current_serv)
             requests.post(settings.current_serv, files=body, timeout=1)
             return
         except:
             new_num = (settings.server_num+1) % 2
-            print("Server " + str(settings.server_num) + " down, switching to server " + str(new_num))
+            print(get_time() + ": Server " + str(settings.server_num) + " down, switching to server " + str(new_num))
             settings.switch_server()
+
+def get_time():
+    return time.asctime(time.localtime(time.time())
