@@ -2,65 +2,61 @@ import requests
 import json
 import os
 import shutil
-import glob
-import faceCropping
 
-serverConnection = "http://128.237.178.179:80"
-# 128.237.178.179
-cloudletIP = "temp"
-cloudletPort = "temp"
+serv1 = "http://128.237.124.45:80"
+serv2 = "http://128.237.124.45:72"
 
-amberTime = 10
+fileList = []
+
 #set yourself up with the server
 def registerPhone():
-    global cloudletIP
-    global cloudletPort
+    global cloudlet
     # tell server that you would like to help find the kid
-    serverResponse = requests.post(serverConnection, files={"requestType":"phoneJoinReq","id": "1"})
+    registerBody = {"requestType":"phoneJoinReq","id": "1"}
+    serverResponse = None
+    try:
+        serverResponse = requests.post(serv1, files=registerBody, timeout=1)
+    except:
+        try:
+            print("First server down(" + serv1 + "), trying second server(" + serv2 + ")")
+            serverResponse = requests.post(serv2, files=registerBody, timeout=1)
+        except:
+            print("Both servers unavailable, aborting...")
+            sys.exit()
     print (serverResponse.text)
     r = json.loads(serverResponse.text)
     
     # Parse the server response for the cloudlet's IP and Port
     cloudletIP = r["IP"]
     cloudletPort = r["port"]
+    cloudlet = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
+    return cloudlet
 
 
+cloudlet = registerPhone()
 
-def isAfterAmber(filePath, amberTime = 10):
-    return True
+while(1):
+    # create temp directory to copy images to
+    tempdir = os.getcwd() + '/__tEmPoRArY_NANI'
+    if not os.path.exists(tempdir):
+        os.makedirs(tempdir)
 
-x = input("would you like to send your photos? ")
+    #TODO: GUI to get file names and copy them to the tempdir
 
-# TODO: make this into a loop so you can continuously send more photos
-if (x == "yes"): 
-    registerPhone()
+    # zip new directory and remove the temp folder
+    shutil.make_archive('output', 'zip', tempdir)
+    shutil.rmtree(tempdir)
 
-    cloudletConnection = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
-
-    # create new directory to hold cropped faces
-    # changed it to the unknown folder for now for the demo
-    newpath = os.getcwd() + '/unknown'
-    print (newpath)
-    if not os.path.exists(newpath):
-        os.makedirs(newpath)
-
-    # TODO: crop faces and put in new directory
-    # src_dir = os.getcwd() + '/images'
-    #dst_dir = os.getcwd() + '/images/faces'
-    #for jpgfile in glob.iglob(os.path.join(src_dir, "*.jpg")):
-    #    fname, ext = os.path.splitext(jpgfile)
-    #    if (isAfterAmber(fname, amberTime)):
-    #        facecrop(jpgfile)
-    
-    # zip new directory
-    shutil.make_archive('output', 'zip', newpath)
-    
     # send zipped directory file to cloudlet
-
     files = {'requestType': 'newPhotos' ,'zip': open('output.zip', 'rb')}
-    cloudletResponse = requests.post(cloudletConnection, files=files)
+    requests.post(cloudlet, files=files, timeout=5)
 
-
-    # TODO: delete directory and zipped file
+    #delete zip file
     os.remove('output.zip')
     print("images sent")
+
+#we're done, phone leave
+try:
+    requests.post(cloudlet, files={'requestType': 'leave'}, timeout =1)
+except:
+    pass
