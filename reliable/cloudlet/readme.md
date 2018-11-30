@@ -10,6 +10,19 @@ check this out later for multithreading: https://stackoverflow.com/questions/140
 
 ^be careful about deleting jobs while processing them tho if you do this
 
+### Running the cloudlet
+
+```
+sudo python3 cloudlet.py arg1 arg2 arg3 arg4
+```
+arg1: IP address of the first server  
+arg2: IP address of the second server  
+arg3: The port this cloudlet will listen on  
+arg4: The heartbeat interval between this cloudlet and the primary server  
+
+Note that if you run multiple instances of cloudlet on a single machine you MUST run 
+them in different directories and on different ports
+
 ### How to communicate with the cloudlet
 
 #### Making requests to the cloudlet:
