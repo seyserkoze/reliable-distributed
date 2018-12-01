@@ -3,8 +3,15 @@
 
 ### Prerequisites
 
-requests library: http://docs.python-requests.org/en/master/
-geocoder: 
+requests library: http://docs.python-requests.org/en/master/ (clone the repo then `pip install .`)
+
+### Running the Phone
+
+```
+python3 phone.py optionalArg1 optionalArg2
+```
+optionalArg1: IP address of the first server  
+optionalArg2: IP address of the second server  
 
 ### Phone Commmunication
 

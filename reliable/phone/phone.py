@@ -5,8 +5,6 @@ import shutil
 import sys
 from tkinter import filedialog
 import tkinter
-#import exifread
-#Add this to readme dependables if we do it: exifread: https://pypi.org/project/ExifRead/ (pip3 install exifread)
 
 serv1 = "http://128.237.124.45:80"
 serv2 = "http://128.237.124.45:72"
@@ -34,71 +32,112 @@ def registerPhone():
     cloudlet = "http://" + str(cloudletIP) + ":" + str(cloudletPort)
     return cloudlet
 
-#copies all files in 'files' to the directory 'tempdir'
-#TODO: add the location stuff to this function
-def copyFiles(files, tempdir):
-    # lat1 = "Latitude"
-    # lat2 = "EXIF Latitude"
-    # long1 = "Longitude"
-    # long2 = "EXIF Longitude"
-    location = "Pittsburgh, PA"
-    count = 0
-    for f in files:
-        file_ending = f.split(".")[-1]
-        name = location + str(count) + file_ending
-        new_name = os.path.join(tempdir, name)
-        shutil.copy(f, new_name)
-        count += 1
-        # fp = open(f, 'rb')
-        # tags = exifread.process_file(fp)
-        # fp.close()
-        # keys = tags.keys()
-        # lat = ""
-        # lon = ""
-        # #latitude
-        # if (lat1 in keys):
-        #     lat = keys[lat1]
-        # elif (lat2 in keys):
-        #     lat = keys[lat2]
-        # #longitude
-        # if (long1 in keys):
-        #     lon = keys[long1]
-        # elif (long2 in keys):
-        #     lon = keys[long2]
-        # location = #https://stackoverflow.com/questions/20169467/how-to-convert-from-longitude-and-latitude-to-country-or-city
-        # shutil.copy2(f, os.path.join(tempdir, location))
+#GUI
+class PhoneGUI:
+    def __init__(self, master, cloudlet):
+        #logic variables
+        self.files = []
+        self.cloudlet = cloudlet
 
+        #GUI stuff
+        self.master = master
+        master.title("Amber Alert Search")
 
+        #Label
+        self.label_text = tkinter.StringVar()
+        self.label_text.set("Choose images to submit to help out the search!")
+        self.label = tkinter.Label(master, textvariable=self.label_text)
+        self.label.grid(columnspan=3, sticky=tkinter.N)
+
+        #where we display selected files
+        self.text = tkinter.Text(master, height=15, width=60)
+        self.text.insert(tkinter.INSERT, "No images selected")
+        self.text.grid(columnspan=3, row=1)
+        self.yscroller = tkinter.Scrollbar(master, command=self.text.yview)
+        self.yscroller.grid(row=1, column=3)
+        self.text.config(yscrollcommand=self.yscroller.set)
+
+        #buttons
+        self.add_button = tkinter.Button(master, text="Add Images", command=self.add_files)
+        self.add_button.grid(column=0, row=3)
+
+        self.clear_button = tkinter.Button(master, text="Clear Selection", command=self.clear)
+        self.clear_button.grid(column=1, row=3)
+
+        self.send_button = tkinter.Button(master, text="Send images", command=self.send)
+        self.send_button.grid(column=2, row=3)
+
+        self.close_button = tkinter.Button(master, text="Close", command=master.quit)
+        self.close_button.grid(column=3, row=3)
+
+    def add_files(self):
+        new_files = tkinter.filedialog.askopenfilenames(parent=root, title='Choose images to send')
+        for nf in new_files:
+            self.files.append(nf)
+        self.label_text.set("Send these images?")
+        self.text.delete(1.0, tkinter.END)
+        for f in self.files:
+            name = os.path.basename(f)
+            self.text.insert(tkinter.INSERT, name + "\n")
+
+    def clear(self):
+        self.files = []
+        self.text.delete(1.0, tkinter.END)
+        self.text.insert(tkinter.INSERT, "No images selected")
+        self.label_text.set("Select images to send")
+    
+    def send(self):
+        if self.files == []:
+            self.label_text.set("No Images to send! Select images first!")
+            return
+        # create temp directory to copy images to
+        tempdir = os.getcwd() + '/__tEmPoRArY_NANI'
+        if not os.path.exists(tempdir):
+            os.makedirs(tempdir)
+
+        copyFiles(tempdir)
+        # zip new directory and remove the temp folder
+        shutil.make_archive('output', 'zip', tempdir)
+        shutil.rmtree(tempdir)
+
+        # send zipped directory file to cloudlet
+        files = {'requestType': 'newPhotos' ,'zip': open('output.zip', 'rb')}
+        requests.post(cloudlet, files=files, timeout=5)
+
+        #delete zip file
+        os.remove('output.zip')
+
+        #clean up the gui
+        self.files = []
+        self.label_text.set("Images sent!, select more images to send?")
+        self.text.delete(1.0, tkinter.END)
+        self.text.insert(tkinter.INSERT, "No images selected")
+
+    #copies all files in 'files' to the directory 'tempdir'
+    #currently spoofing all pic locations to Pittsburgh
+    def copyFiles(self, tempdir):
+        location = "Pittsburgh, PA"
+        count = 0
+        for f in self.files:
+            file_ending = f.split(".")[-1]
+            name = location + str(count) + file_ending
+            new_name = os.path.join(tempdir, name)
+            shutil.copy(f, new_name)
+            count += 1
 
 
 ######################START##################################
+if len(sys.argv > 1): #firt arg exists
+    serv1 = sys.argv[1]
+if len(sys.argv == 2): #second one also exists
+    serv2 = sys.argv[2]
+if len(sys.argv > 2):
+    print("Too many commandline arguments, provide only up to 2, the ips of both servers")
+    sys.exit()
 cloudlet = registerPhone()
 root = tkinter.Tk()
 my_gui = PhoneGUI(root)
 root.mainloop()
-
-while(1):
-    # create temp directory to copy images to
-    tempdir = os.getcwd() + '/__tEmPoRArY_NANI'
-    if not os.path.exists(tempdir):
-        os.makedirs(tempdir)
-
-    #TODO: GUI to get file names and copy them to the tempdir
-
-
-    copyFiles(fileList)
-    # zip new directory and remove the temp folder
-    shutil.make_archive('output', 'zip', tempdir)
-    shutil.rmtree(tempdir)
-
-    # send zipped directory file to cloudlet
-    files = {'requestType': 'newPhotos' ,'zip': open('output.zip', 'rb')}
-    requests.post(cloudlet, files=files, timeout=5)
-
-    #delete zip file
-    os.remove('output.zip')
-    print("images sent")
-
 #we're done, phone leave
 try:
     requests.post(cloudlet, files={'requestType': 'leave'}, timeout =1)
