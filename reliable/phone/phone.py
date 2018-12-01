@@ -116,7 +116,7 @@ class PhoneGUI:
     #copies all files in 'files' to the directory 'tempdir'
     #currently spoofing all pic locations to Pittsburgh
     def copyFiles(self, tempdir):
-        location = "Pittsburgh_PA"
+        location = "Pittsburgh_PA_"
         count = 0
         for f in self.files:
             file_ending = f.split(".")[-1]
