@@ -117,7 +117,7 @@ def getJobs():
     body = {"requestType" : "getJobs", "cloudIP" : settings.my_ip, "cloudPort": str(settings.my_port)}
     post_request(body)
     t = get_time()
-    printf(t + ": Receiving current jobs...")
+    print(t + ": Receiving current jobs...")
     return
 
 def heartbeat():
@@ -147,4 +147,4 @@ def post_request(body):
             settings.switch_server()
 
 def get_time():
-    return time.asctime(time.localtime(time.time())
+    return time.asctime(time.localtime(time.time()))

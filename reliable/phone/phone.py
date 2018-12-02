@@ -6,8 +6,8 @@ import sys
 from tkinter import filedialog
 import tkinter
 
-serv1 = "http://128.237.124.45:80"
-serv2 = "http://128.237.124.45:72"
+serv1 = "http://128.237.184.98:102"
+serv2 = "http://128.237.184.98:72"
 
 #set yourself up with the server
 def registerPhone():
@@ -95,7 +95,7 @@ class PhoneGUI:
         if not os.path.exists(tempdir):
             os.makedirs(tempdir)
 
-        copyFiles(tempdir)
+        self.copyFiles(tempdir)
         # zip new directory and remove the temp folder
         shutil.make_archive('output', 'zip', tempdir)
         shutil.rmtree(tempdir)
@@ -127,16 +127,16 @@ class PhoneGUI:
 
 
 ######################START##################################
-if len(sys.argv > 1): #firt arg exists
+if len(sys.argv) > 1: #firt arg exists
     serv1 = sys.argv[1]
-if len(sys.argv == 2): #second one also exists
+if len(sys.argv) == 2: #second one also exists
     serv2 = sys.argv[2]
-if len(sys.argv > 2):
+if len(sys.argv) > 2:
     print("Too many commandline arguments, provide only up to 2, the ips of both servers")
     sys.exit()
 cloudlet = registerPhone()
 root = tkinter.Tk()
-my_gui = PhoneGUI(root)
+my_gui = PhoneGUI(root, cloudlet)
 root.mainloop()
 #we're done, phone leave
 try:
