@@ -7,7 +7,6 @@ from tkinter import filedialog
 import tkinter
 
 serv1 = "http://128.237.184.98:102"
-serv2 = "http://128.237.184.98:72"
 
 #set yourself up with the server
 def registerPhone():
@@ -17,15 +16,11 @@ def registerPhone():
     try:
         serverResponse = requests.post(serv1, files=registerBody, timeout=1)
     except:
-        try:
-            print("First server down(" + serv1 + "), trying second server(" + serv2 + ")")
-            serverResponse = requests.post(serv2, files=registerBody, timeout=1)
-        except:
-            print("Both servers unavailable, aborting...")
-            sys.exit()
-    print (serverResponse.text)
+        print("unable to reach server at: " + serv1)
+        print("aborting...")
+        sys.exit()
+
     r = json.loads(serverResponse.text)
-    
     # Parse the server response for the cloudlet's IP and Port
     cloudletIP = r["IP"]
     cloudletPort = r["port"]
@@ -127,12 +122,10 @@ class PhoneGUI:
 
 
 ######################START##################################
-if len(sys.argv) > 1: #firt arg exists
-    serv1 = sys.argv[1]
-if len(sys.argv) == 2: #second one also exists
-    serv2 = sys.argv[2]
+if len(sys.argv) == 2: #firt arg exists
+    serv1 = "http://" + sys.argv[1]
 if len(sys.argv) > 2:
-    print("Too many commandline arguments, provide only up to 2, the ips of both servers")
+    print("Too many commandline arguments, provide only the ip of the server")
     sys.exit()
 cloudlet = registerPhone()
 root = tkinter.Tk()
