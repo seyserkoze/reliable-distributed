@@ -16,7 +16,7 @@ def main():
   if currentServerStatus ==  'S':
     files = {'requestType': 'getState'}
     r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files)
-    print("got answer")
+    print("GOT STATE FROM PRIMARY - STATE INITIALIZED")
     with open("cloudletStore.json", "w") as f:
       currentJson = r.json()
       json.dump(currentJson, f)
@@ -43,7 +43,7 @@ def main():
           try:
             files = {'requestType': 'heartbeat'}
             r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files, timeout=1)
-
+            print("SENDING UPDATE STATE REQUEST TO SECONDARY")
             files = {'requestType': 'updateState', 'zip':open('cloudletStore.json','rb')}
             r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files)
           except:

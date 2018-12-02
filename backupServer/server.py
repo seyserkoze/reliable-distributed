@@ -24,16 +24,19 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
     reqType = self.getKeyValue(form, "requestType")
 
     if(reqType == 'phoneJoinReq'):
+      print("PHONE JOIN REQUEST RECEIVED")
       response = simpleLB()
       response = json.dumps(response)
+      print("PHONE WAS ASSIGINED TO CLOUDLET: ",response)
       self.wfile.write(response.encode('utf-8'))
     elif(reqType == 'cloudJoinReq'):
+      print("CLOUDLET JOIN REQUEST RECEIVED")
       cloudletIP = self.getKeyValue(form,"cloudIP")
       cloudletPort = self.getKeyValue(form,"cloudPort")
 
       addToCurrentCloudlets(cloudletIP, cloudletPort)
 
-
+      print("CLOUDLET STATE WAS UPDATED")
     elif(reqType == "match"):
       filename = form['zip'].filename
       data = form['zip'].file.read()
@@ -41,28 +44,30 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
       fp.write(data)
       fp.close()
     elif(reqType == "getState"):
-      print("Get state request received")
+      print("RECEIVED GET STATE REQUEST FROM SECONDARY")
       with open('cloudletStore.json', "r") as f:
         data = json.load(f)
         curr = json.dumps(data)
         self.wfile.write(curr.encode('utf-8'))
     elif(reqType == "updateState"):
+      print("RECEIVED UPDATE STATE REQUEST FROM PRIMARY")
+      print("")
       data = form['zip'].file.read()
       fp = open('cloudletStore.json', "wb")
       fp.write(data)
       fp.close()
+      print("STATE WAS UPDATED TO MATCH PRIMARY")
     elif(reqType == 'phoneLeaveReq'):
       cloudletIP = self.getKeyValue(form,"cloudIP")
       cloudletPort = self.getKeyValue(form,"cloudPort")
       leaveCloudlet(cloudletIP, cloudletPort)
 
     elif(reqType == 'getJobs'):
-      cloudletIP = self.getKeyValue(form,"cloudIP")
-      cloudletPort = self.getKeyValue(form,"cloudPort")
       for fileVal in os.listdir("../reliable/reliablemedia/lookup/"):
         if(fileVal.endswith('.zip')):
-          files = {'requestType': 'newJob', 'zip':open('../reliable/reliablemedia/lookup/'+fileVal,'rb')}
+          files = {'requestType': 'newJob', 'zip':open(fileVal,'rb')}
           r = requests.post("http://"+cloudletIP+":"+cloudletPort, files=files)
+      print("ALL JOBS SENT TO NEW CLOUDLET")
     return
 
 
