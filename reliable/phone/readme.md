@@ -8,10 +8,9 @@ requests library: http://docs.python-requests.org/en/master/ (clone the repo the
 ### Running the Phone
 
 ```
-python3 phone.py optionalArg1 optionalArg2
+python3 phone.py optionalArg1
 ```
-optionalArg1: IP address of the first server  
-optionalArg2: IP address of the second server  
+optionalArg1: IP address of the server, if you dont supply it itll use a default hardcoded one 
 
 ### Phone Commmunication
 
