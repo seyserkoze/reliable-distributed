@@ -3,20 +3,22 @@ import os, os.path
 import glob
 import json
 import sys
+import time
 
 def main():
   argList = sys.argv
   alternateServerIP = argList[1]
   alternateServerPort = argList[2]
   currentServerStatus = argList[3]
-
+  retryTime = argList[4]
+  print("Timeout set to: " + retryTime + " seconds")
   print("Initialized a " + currentServerStatus + " server")
 
 
   if currentServerStatus ==  'S':
     files = {'requestType': 'getState'}
     r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files)
-    print("GOT STATE FROM PRIMARY - STATE INITIALIZED")
+    print("GOT STATE FROM PRIMARY - STATE INITIALIZED @ ", get_time())
     with open("cloudletStore.json", "w") as f:
       currentJson = r.json()
       json.dump(currentJson, f)
@@ -34,16 +36,18 @@ def main():
       try:
         files = {'requestType': 'heartbeat'}
         r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files, timeout=1)
+        print("SENT HEARBEAT @ ", get_time())
       except:
+        print("PRIMARY HAS FAILED, TAKING OVER AS PRIMARY @ ", get_time())
         currentServerStatus = 'P'
-
+      time.sleep(int(retryTime))
     elif(currentServerStatus == 'P'):
       if((os.path.exists('cloudletStore.json'))):
         if(flag == 0 or os.stat("cloudletStore.json").st_mtime > stamp):
           try:
             files = {'requestType': 'heartbeat'}
             r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files, timeout=1)
-            print("SENDING UPDATE STATE REQUEST TO SECONDARY")
+            print("SENDING UPDATE STATE REQUEST TO SECONDARY @ ", get_time())
             files = {'requestType': 'updateState', 'zip':open('cloudletStore.json','rb')}
             r = requests.post('http://'+alternateServerIP+":"+alternateServerPort, files=files)
           except:
@@ -72,4 +76,8 @@ def main():
 
 print latest_file
 '''
+
+def get_time():
+  return time.asctime(time.localtime(time.time()))
+
 main()

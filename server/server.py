@@ -7,6 +7,7 @@ import socket
 import cgi
 import sys
 import requests
+import time
 
 #Create custom HTTPRequestHandler class
 class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -24,19 +25,19 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
     reqType = self.getKeyValue(form, "requestType")
 
     if(reqType == 'phoneJoinReq'):
-      print("PHONE JOIN REQUEST RECEIVED")
+      print("PHONE JOIN REQUEST RECEIVED @ ", get_time())
       response = simpleLB()
       response = json.dumps(response)
       print("PHONE WAS ASSIGINED TO CLOUDLET: ",response)
       self.wfile.write(response.encode('utf-8'))
     elif(reqType == 'cloudJoinReq'):
-      print("CLOUDLET JOIN REQUEST RECEIVED")
+      print("CLOUDLET JOIN REQUEST RECEIVED @ ", get_time())
       cloudletIP = self.getKeyValue(form,"cloudIP")
       cloudletPort = self.getKeyValue(form,"cloudPort")
 
       addToCurrentCloudlets(cloudletIP, cloudletPort)
 
-      print("CLOUDLET STATE WAS UPDATED")
+      print("CLOUDLET STATE WAS UPDATED @ ", get_time())
     elif(reqType == "match"):
       filename = form['zip'].filename
       data = form['zip'].file.read()
@@ -44,19 +45,19 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
       fp.write(data)
       fp.close()
     elif(reqType == "getState"):
-      print("RECEIVED GET STATE REQUEST FROM SECONDARY")
+      print("RECEIVED GET STATE REQUEST FROM SECONDARY @ ", get_time())
       with open('cloudletStore.json', "r") as f:
         data = json.load(f)
         curr = json.dumps(data)
         self.wfile.write(curr.encode('utf-8'))
     elif(reqType == "updateState"):
-      print("RECEIVED UPDATE STATE REQUEST FROM PRIMARY")
+      print("RECEIVED UPDATE STATE REQUEST FROM PRIMARY @ ", get_time())
       print("")
       data = form['zip'].file.read()
       fp = open('cloudletStore.json', "wb")
       fp.write(data)
       fp.close()
-      print("STATE WAS UPDATED TO MATCH PRIMARY")
+      print("STATE WAS UPDATED TO MATCH PRIMARY @ ", get_time())
     elif(reqType == 'phoneLeaveReq'):
       cloudletIP = self.getKeyValue(form,"cloudIP")
       cloudletPort = self.getKeyValue(form,"cloudPort")
@@ -69,7 +70,7 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
           files = {'requestType': 'newJob', 'zip':open(fileVal,'rb')}
           r = requests.post("http://"+cloudletIP+":"+cloudletPort, files=files)
           check = 1
-      if(check): print("ALL JOBS SENT TO NEW CLOUDLET")
+      if(check): print("ALL JOBS SENT TO NEW CLOUDLET @ ", get_time())
     return
 
 
@@ -81,6 +82,9 @@ class KodeFunHTTPRequestHandler(BaseHTTPRequestHandler):
     except AttributeError:
       pass
     return value
+
+def get_time():
+	return time.asctime(time.localtime(time.time()))
 
 def leaveCloudlet(cloudletIP, cloudletPort):
   with open('cloudletStore.json', 'r') as f:
