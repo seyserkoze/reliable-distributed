@@ -126,7 +126,7 @@ def heartbeat():
         print(get_time() + ": sending heartbeat...", end="") #dont start a newline
         try:
             #try to make a request with a timeout of 1 second
-            requests.post(settings.current_serv, files=body, timeout=1)
+            requests.post(settings.current_serv, files=body, timeout=3)
             print("server is alive")
         except:
             print("failed, switching server")
@@ -139,7 +139,7 @@ def post_request(body):
     while(1):
         try:
             #try to make a request with a timeout of 1 second
-            requests.post(settings.current_serv, files=body, timeout=1)
+            requests.post(settings.current_serv, files=body, timeout=3)
             return
         except:
             new_num = (settings.server_num+1) % 2
