@@ -6,8 +6,7 @@ import sys
 from tkinter import filedialog
 import tkinter
 
-serv1 = "http://128.237.184.98:102"
-serv2 = "http://128.237.184.98:72"
+serv1 = "http://128.237.193.132:102"
 
 #set yourself up with the server
 def registerPhone():
@@ -15,17 +14,13 @@ def registerPhone():
     registerBody = {"requestType":"phoneJoinReq","id": "1"}
     serverResponse = None
     try:
-        serverResponse = requests.post(serv1, files=registerBody, timeout=1)
+        serverResponse = requests.post(serv1, files=registerBody, timeout=5)
     except:
-        try:
-            print("First server down(" + serv1 + "), trying second server(" + serv2 + ")")
-            serverResponse = requests.post(serv2, files=registerBody, timeout=1)
-        except:
-            print("Both servers unavailable, aborting...")
-            sys.exit()
-    print (serverResponse.text)
+        print("unable to reach server at: " + serv1)
+        print("aborting...")
+        sys.exit()
+
     r = json.loads(serverResponse.text)
-    
     # Parse the server response for the cloudlet's IP and Port
     cloudletIP = r["IP"]
     cloudletPort = r["port"]
@@ -52,6 +47,7 @@ class PhoneGUI:
         #where we display selected files
         self.text = tkinter.Text(master, height=15, width=60)
         self.text.insert(tkinter.INSERT, "No images selected")
+        self.text.config(state=tkinter.DISABLED)
         self.text.grid(columnspan=3, row=1)
         self.yscroller = tkinter.Scrollbar(master, command=self.text.yview)
         self.yscroller.grid(row=1, column=3)
@@ -71,6 +67,7 @@ class PhoneGUI:
         self.close_button.grid(column=3, row=3)
 
     def add_files(self):
+        self.text.config(state=tkinter.NORMAL)
         new_files = tkinter.filedialog.askopenfilenames(parent=root, title='Choose images to send')
         for nf in new_files:
             self.files.append(nf)
@@ -79,14 +76,18 @@ class PhoneGUI:
         for f in self.files:
             name = os.path.basename(f)
             self.text.insert(tkinter.INSERT, name + "\n")
+        self.text.config(state=tkinter.DISABLED)
 
     def clear(self):
+        self.text.config(state=tkinter.NORMAL)
         self.files = []
         self.text.delete(1.0, tkinter.END)
         self.text.insert(tkinter.INSERT, "No images selected")
+        self.text.config(state=tkinter.DISABLED)
         self.label_text.set("Select images to send")
     
     def send(self):
+        self.text.config(state=tkinter.NORMAL)
         if self.files == []:
             self.label_text.set("No Images to send! Select images first!")
             return
@@ -112,6 +113,7 @@ class PhoneGUI:
         self.label_text.set("Images sent!, select more images to send?")
         self.text.delete(1.0, tkinter.END)
         self.text.insert(tkinter.INSERT, "No images selected")
+        self.text.config(state=tkinter.DISABLED)
 
     #copies all files in 'files' to the directory 'tempdir'
     #currently spoofing all pic locations to Pittsburgh
@@ -127,12 +129,10 @@ class PhoneGUI:
 
 
 ######################START##################################
-if len(sys.argv) > 1: #firt arg exists
-    serv1 = sys.argv[1]
-if len(sys.argv) == 2: #second one also exists
-    serv2 = sys.argv[2]
+if len(sys.argv) == 2: #firt arg exists
+    serv1 = "http://" + sys.argv[1]
 if len(sys.argv) > 2:
-    print("Too many commandline arguments, provide only up to 2, the ips of both servers")
+    print("Too many commandline arguments, provide only the ip of the server")
     sys.exit()
 cloudlet = registerPhone()
 root = tkinter.Tk()
@@ -140,6 +140,6 @@ my_gui = PhoneGUI(root, cloudlet)
 root.mainloop()
 #we're done, phone leave
 try:
-    requests.post(cloudlet, files={'requestType': 'leave'}, timeout =1)
+    requests.post(cloudlet, files={'requestType': 'leave'}, timeout =5)
 except:
     pass
